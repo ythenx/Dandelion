@@ -106,7 +106,7 @@ public class MainActivity extends Activity {
 		println("Summing up...");
 		println(String.format("StartNum: %d\nEndNum: %d", startNum, endNum));
 		
-		final int num = 1;
+		final int num = 2;
 		final Long[] result = new Long[num];
 		TestTask[] task = new TestTask[num];
 		final OfflaodableMethod[] om = new OfflaodableMethod[num];

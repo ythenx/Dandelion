@@ -1,6 +1,6 @@
 package com.symlab.dandelion;
 
-public interface Constants {
+public interface Constants { 
 	//
 	int NETWORK_PING = 1;
 	int NETWORK_PONG = 2;

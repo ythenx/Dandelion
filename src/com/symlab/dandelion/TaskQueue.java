@@ -25,4 +25,7 @@ public class TaskQueue {
 	public void clearQueue() {
 		queue.clear();
 	}
+	public LinkedList<OfflaodableMethod> getQueue(){
+		return queue;
+	}
 }

@@ -21,13 +21,14 @@ public class StatusUpdater {
 
 		@Override
 		public void run() {
+			netInt.discoverService();
 			//Log.d(TAG, "Updating status...");
 			try {
 				status.updateStatus(deviceList);
 			} catch (InterruptedException e) {
 				e.printStackTrace();
 			}
-			//handler.postDelayed(this,timeInterval); 
+			handler.postDelayed(this,timeInterval); 
 		}
 		
 	};
@@ -41,7 +42,7 @@ public class StatusUpdater {
 	}
 	
 	public void startUpdate() {
-		netInt.discoverService();
+		//netInt.discoverService();
 		handler.post(task); 
 	}
 	

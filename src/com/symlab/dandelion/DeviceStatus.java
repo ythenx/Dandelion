@@ -40,7 +40,7 @@ public class DeviceStatus {
 	public Status readStatus() {
 		//Status status = new Status();
 		status.numOfProcessors = runtime.availableProcessors();
-		status.cpuIdelness = 100f - readCpuUsage()*100f;
+		status.cpuIdleness = 100f - readCpuUsage()*100f;
 //		try {
 			activityManager.getMemoryInfo(mi);
 			status.memoryFree = mi.availMem/1048576f;

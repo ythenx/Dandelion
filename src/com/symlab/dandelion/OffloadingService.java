@@ -36,12 +36,19 @@ public class OffloadingService extends Service {
 	
 	private StatusUpdater su;
 	
-	private int updateInterval = 10000;
+	private int updateInterval = 60000;
 	
 	private void toast(String s) {
 		Toast.makeText(this, s, Toast.LENGTH_LONG).show();
 	}
 	
+	public StatusTableData getStatusTableData(){
+		return status.getStatusTableData();
+	}
+	
+	public void updateDeviceList(){
+		
+	}
 	
 	private final IOffloadingService.Stub mBinder = new IOffloadingService.Stub() {
 
@@ -132,7 +139,7 @@ public class OffloadingService extends Service {
     	ds = new DeviceStatus(this);
     	status = new StatusTable(this);
     	su = new StatusUpdater(ni,deviceList, status, updateInterval);
-    	
+    	su.startUpdate();
     	queue = new TaskQueue();
     	tqh = new TaskQueueHandler(queue, this, deviceList);
     	tqh.start();

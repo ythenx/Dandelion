@@ -24,6 +24,39 @@ public class StatusTableData implements Parcelable {
 		//out.writeList(addressCol);
 	}
 	
+	public void sortDescStatus(String index){
+		float[] array = new float[statusCol.size()];
+		if(index.compareTo("cpuIdleness")==0){
+			for(int i=0; i<statusCol.size(); i++){
+				array[i] = statusCol.get(i).cpuIdleness;
+			}
+		}else if(index.compareTo("batteryPercentage")==0){
+			for(int i=0; i<statusCol.size(); i++){
+				array[i] = statusCol.get(i).batteryPercentage;
+			}
+		}else if(index.compareTo("memoryFree")==0){
+			for(int i=0; i<statusCol.size(); i++){
+				array[i] = statusCol.get(i).memoryFree;
+			}
+		}
+		
+		for(int j=1; j< array.length; j++){
+			float key =  array[j];
+			Status keyS = new Status(statusCol.get(j));
+			String keyD = deviceId.get(j);
+			int i=j-1;
+			while(i>=0 && array[i]<key){
+				array[i+1]=array[i];
+				deviceId.set(i+1, deviceId.get(i));
+				statusCol.set(i+1, statusCol.get(i));
+				i--;
+			}
+			array[i+1]=key;
+			deviceId.set(i+1, keyD);
+			statusCol.set(i+1, keyS);
+		}
+	}
+	
 	public static final Parcelable.Creator<StatusTableData> CREATOR = new Parcelable.Creator<StatusTableData>() {
 		public StatusTableData createFromParcel(Parcel in) {
 			return new StatusTableData(in);
@@ -77,6 +110,11 @@ public class StatusTableData implements Parcelable {
 		deviceId.remove(tmp);
 		statusCol.remove(tmp);
 		//addressCol.remove(tmp);
+	}
+	
+	public void clearData(){
+		deviceId.clear();
+		statusCol.clear();
 	}
 	/*
 	public void removeByIp(InetAddress ip) {

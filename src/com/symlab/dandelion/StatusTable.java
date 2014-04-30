@@ -1,19 +1,13 @@
 package com.symlab.dandelion;
 
+import java.io.IOException;
 import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
-import java.net.ConnectException;
-import java.net.InetAddress;
-import java.net.InetSocketAddress;
-import java.net.Socket;
-import java.net.SocketTimeoutException;
-import java.util.List;
-import java.util.concurrent.CountDownLatch;
-
-import com.symlab.dandelion.network.ConnectedDeviceList;
 
 import android.content.Context;
 import android.util.Log;
+
+import com.symlab.dandelion.network.ConnectedDeviceList;
 
 public class StatusTable {
 	private StatusTableData data;
@@ -38,7 +32,7 @@ public class StatusTable {
 		//updateSelf(currId);
 		Thread[] t = new Thread[deviceList.size()];
 		//CountDownLatch latch = new CountDownLatch(t.length);
-		
+		data.clearData();
 		for(int i = 0; i < deviceList.size(); i++) {
 			String key = deviceList.getDeviceList().get(i);
 			Log.d(TAG, "Updating " + key);
@@ -53,7 +47,7 @@ public class StatusTable {
 		String result = "Device ID\tNumOfCores\tCPU Idleness\tBattery\tMemoryAvil\n";
 		for(int i = 0; i < data.statusCol.size(); i++) {
 			Status s = data.statusCol.get(i);
-			result += (data.deviceId.get(i)) + '\t' + s.numOfProcessors + '\t' + s.cpuIdelness + "%\t" + s.batteryPercentage + "%\t" + s.memoryFree + "MB\n";
+			result += (data.deviceId.get(i)) + '\t' + s.numOfProcessors + '\t' + s.cpuIdleness + "%\t" + s.batteryPercentage + "%\t" + s.memoryFree + "MB\n";
 		}
 		return result;
 	}
@@ -105,7 +99,7 @@ public class StatusTable {
 				Log.e(TAG, "Read status object...");
 				
 				Log.d(TAG, String.format("Device ID: %s", id));
-				Log.d(TAG, String.format("CPU Idelness: %f%%\nBattery: %f%%\nMemory Free: %fMB", status.cpuIdelness, status.batteryPercentage, status.memoryFree));
+				Log.d(TAG, String.format("CPU Idelness: %f%%\nBattery: %f%%\nMemory Free: %fMB", status.cpuIdleness, status.batteryPercentage, status.memoryFree));
  
 				data.add(id, status);
 				
@@ -118,8 +112,8 @@ public class StatusTable {
 				//mLatch.countDown();
 				Log.e(TAG, "Read status object finished.");
 
-			} catch (ConnectException se){
-
+			} catch (IOException se){
+				
 			} catch (Exception e) {
 				Log.d(TAG, e.toString());
 				e.printStackTrace();

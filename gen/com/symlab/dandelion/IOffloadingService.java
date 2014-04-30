@@ -1,6 +1,6 @@
 /*
  * This file is auto-generated.  DO NOT MODIFY.
- * Original file: /home/yeh/workspace/Dandelion5/src/com/symlab/dandelion/IOffloadingService.aidl
+ * Original file: /home/hd/Research/Offloading/program/git/src/com/symlab/dandelion/IOffloadingService.aidl
  */
 package com.symlab.dandelion;
 public interface IOffloadingService extends android.os.IInterface

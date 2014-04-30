@@ -11,7 +11,7 @@ public class Status implements Parcelable, Serializable {
 	 */
 	private static final long serialVersionUID = 6492377379482256344L;
 	public int numOfProcessors;
-	public float cpuIdelness;
+	public float cpuIdleness;
 	public float batteryPercentage;
 	public float memoryFree;
 	
@@ -21,6 +21,13 @@ public class Status implements Parcelable, Serializable {
 		//this.loader = loader;
 	}
 	
+	public Status(Status s){
+		this.numOfProcessors = s.numOfProcessors;
+		this.cpuIdleness = s.cpuIdleness;
+		this.batteryPercentage = s.batteryPercentage;
+		this.memoryFree = s.memoryFree;
+	}
+	
 	@Override
 	public int describeContents() {
 		return 0;
@@ -28,7 +35,7 @@ public class Status implements Parcelable, Serializable {
 	@Override
 	public void writeToParcel(Parcel out, int flags) {
 		out.writeInt(numOfProcessors);
-		out.writeFloat(cpuIdelness);
+		out.writeFloat(cpuIdleness);
 		out.writeFloat(batteryPercentage);
 		out.writeFloat(memoryFree);
 	}
@@ -49,7 +56,7 @@ public class Status implements Parcelable, Serializable {
 	
 	private Status(Parcel in) {
 		numOfProcessors = in.readInt();
-		cpuIdelness = in.readFloat();
+		cpuIdleness = in.readFloat();
 		batteryPercentage = in.readFloat();
 		memoryFree = in.readFloat();
     }

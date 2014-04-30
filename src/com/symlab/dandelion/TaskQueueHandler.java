@@ -1,5 +1,6 @@
 package com.symlab.dandelion;
 
+import java.util.List;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 
@@ -15,36 +16,45 @@ public class TaskQueueHandler extends Thread {
 	private boolean stopped = false;
 	private Object lock;
 	
-	private Context mContext;
+	private OffloadingService mContext;
 	private ConnectedDeviceList deviceList;
 	
 	private ExecutorService executor = Executors.newCachedThreadPool();
 
-	public TaskQueueHandler(TaskQueue q, Context context, ConnectedDeviceList deviceList) {
+	private DecisionMaker dmaker;
+	public TaskQueueHandler(TaskQueue q, OffloadingService context, ConnectedDeviceList deviceList) {
 		mContext = context;
 		lock = new Object();
 		queue = q;
 		this.deviceList = deviceList;
+		dmaker = new DecisionMaker(context.getStatusTableData());
 		//list = new ArrayList<TaskWrapper<?>>();
 	}
 	
 	private void submitTask(OfflaodableMethod om, String target) {
-		TaskWrapper tw = new TaskWrapper(mContext, om, (target != null),deviceList.getOutputStream(target), deviceList.getInputStream(target));
+		TaskWrapper tw = new TaskWrapper(mContext, om, target, deviceList);
 		om.setHolder(executor.submit(tw));
 		om.setResultReady();
+		deviceList.setJobStatusToBusy(target);
 	}
 	
 	@Override
 	public void run() {
 		while (!stopped && !Thread.currentThread().isInterrupted()) {
-
 			while (queue.queueSize() != 0) {
-				try {
-					submitTask(queue.dequeue(), null);
-				} catch (Exception e) {
-					// TODO Auto-generated catch block
-					e.printStackTrace();
-				}
+//				int qSize = queue.queueSize();
+//				if(deviceList.size()*qSize<Constants.DECISION_MAKER_THRESHOLD){
+//					List<String> devices = dmaker.globalOptimalDecision(queue);
+//					for(int i=0; i<qSize; i++){
+//						
+//						submitTask(queue.dequeue(),devices.get(i));
+//					}
+//				}
+//				else{
+				List<String> devices = dmaker.greedyDecision(queue,deviceList);
+				for(int i=0; i<devices.size(); i++)
+					submitTask(queue.dequeue(), devices.get(i));
+//				}
 			}
 			//queue.clearQueue();
 			

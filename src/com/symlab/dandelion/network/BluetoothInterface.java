@@ -6,6 +6,7 @@ import java.io.IOException;
 import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
 import java.io.OptionalDataException;
+import java.util.ArrayList;
 import java.util.Set;
 import java.util.UUID;
 import java.util.concurrent.CopyOnWriteArrayList;
@@ -22,6 +23,7 @@ import android.content.Intent;
 import android.content.IntentFilter;
 import android.util.Log;
 
+import com.symlab.dandelion.Constants;
 import com.symlab.dandelion.DynamicObjectInputStream;
 import com.symlab.dandelion.Master;
 
@@ -43,6 +45,11 @@ public class BluetoothInterface implements NetworkInterface {
 	private Context mContext;
 	private ConnectedDeviceList mDeviceList;
 	private CopyOnWriteArrayList<BluetoothDevice> tempDeviceList;
+	private final String [] fullDeviceList = { 
+			"E4:B0:21:73:CB:B7","CC:C3:EA:0E:B4:70","F8:E0:79:26:51:BD","CC:C3:EA:0E:B4:82",
+			"F0:08:F1:39:75:48","CC:C3:EA:10:1A:E5","E4:B0:21:FD:C1:14","CC:C3:EA:0E:B4:86",
+			"F8:E0:79:31:E5:7D"
+	};
 	
 	public BluetoothInterface(Context context, ConnectedDeviceList deviceList) {
 		mContext = context;
@@ -90,19 +97,51 @@ public class BluetoothInterface implements NetworkInterface {
 		intentFilter.addAction(BluetoothDevice.ACTION_FOUND);
 		intentFilter.addAction(BluetoothAdapter.ACTION_DISCOVERY_FINISHED);
 		mContext.registerReceiver(mReceiver, intentFilter);
-		receiverRegistered = true;
-		
+		receiverRegistered = true;		
 	}
 	
 	private void resolveConnections() {
 		ExecutorService pool = Executors.newCachedThreadPool();
-		mAdapter.cancelDiscovery();
-		Log.e(TAG, "" + tempDeviceList.size());
-		for (BluetoothDevice device : tempDeviceList) {
-			Log.e(TAG, "Device***" + device.getAddress());
-			pool.execute(new ResolveTask(device));
+		//mAdapter.cancelDiscovery();
+		//Log.e(TAG, "" + tempDeviceList.size());
+
+		for (String device : fullDeviceList) {
+			//Log.e(TAG, "Device***" + device);
+			if (mDeviceList.containsNode(device)) {
+				pool.execute(new ResolveExistingTask(device));
+			}
+			else {
+				pool.execute(new ResolveTask(device));
+			}
 			
 		}
+	}
+	
+	private class ResolveExistingTask implements Runnable {
+
+		private String device;
+		private ObjectInputStream ois = null;
+		private ObjectOutputStream oos = null;
+		
+		public ResolveExistingTask(String device) {
+			this.device = device;
+		}
+		@Override
+		public void run() {
+			oos = mDeviceList.getOutputStream(device);
+			ois = mDeviceList.getInputStream(device);
+			int res = -1;
+			try {
+				oos.writeInt(Constants.NETWORK_PING);
+				oos.flush();
+				res = ois.readInt();
+				if (res != Constants.NETWORK_PONG) {
+					mDeviceList.removeNode(device);
+				}
+			} catch (IOException e) {
+				mDeviceList.removeNode(device);
+			}
+		}	
 	}
 	
 	private class ResolveTask implements Runnable {
@@ -111,8 +150,8 @@ public class BluetoothInterface implements NetworkInterface {
 		private ObjectInputStream ois = null;
 		private ObjectOutputStream oos = null;
 		
-		public ResolveTask(BluetoothDevice device) {
-			mDevice = device;
+		public ResolveTask(String device) {
+			mDevice = mAdapter.getRemoteDevice(device);
 		}
 		
 		@Override
@@ -144,8 +183,7 @@ public class BluetoothInterface implements NetworkInterface {
 					return;
 				}
 				mDeviceList.addIfAbsent(bs.getRemoteDevice().getAddress(), ois, oos);
-			} catch (Exception e) {
-				
+			} catch (Exception e){				
 				e.printStackTrace();
 			}
 			
@@ -237,6 +275,8 @@ public class BluetoothInterface implements NetworkInterface {
 
 	@Override
 	public void discoverService() {
+		resolveConnections();
+		/*
 		Set<BluetoothDevice> pairedDevices = mAdapter.getBondedDevices();
 		// If there are paired devices
 		if (pairedDevices.size() > 0) {
@@ -249,7 +289,7 @@ public class BluetoothInterface implements NetworkInterface {
 		registerReceiver();
 		resolved = false;
 		mAdapter.startDiscovery();
-		
+		*/
 	}
 
 	@Override

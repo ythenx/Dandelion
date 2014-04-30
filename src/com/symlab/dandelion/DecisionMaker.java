@@ -1,6 +1,10 @@
 package com.symlab.dandelion;
 
+import java.util.ArrayList;
+import java.util.LinkedList;
 import java.util.List;
+
+import com.symlab.dandelion.network.ConnectedDeviceList;
 
 import android.util.Log;
 
@@ -18,6 +22,27 @@ public class DecisionMaker {
 	
 	public Long getSelectedTarget() {
 		return selectedTargetId;
+	}
+	
+	public List<String> globalOptimalDecision(LinkedList<OfflaodableMethod> taskQueue){
+		List <String> devices=new ArrayList<String>();
+		return devices;
+	}
+	
+	public List<String> greedyDecision(TaskQueue taskQueue,ConnectedDeviceList deviceList){
+		LinkedList<OfflaodableMethod> bufferQueue = new LinkedList<OfflaodableMethod>();
+		
+		List <String> devices=new ArrayList<String>();
+		
+		statustable.sortDescStatus("cpuIdleness");
+		int count=0;
+		for(int i=0; i<deviceList.size(); i++){
+			if(deviceList.getJobStatusList().get(i)==true){
+				devices.add(deviceList.getDeviceList().get(i));
+			}
+		}
+		
+		return devices;
 	}
 	/*
 	public void selectTarget() {

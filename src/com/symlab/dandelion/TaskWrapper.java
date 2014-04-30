@@ -31,17 +31,21 @@ public class TaskWrapper implements Callable<Object> {
 	//private Socket mSocket;
 	private ObjectOutputStream mObjOutStream;
 	private ObjectInputStream mObjInStream;
+	private String target;
+	private ConnectedDeviceList deviceList;
 	
 	private Long mPureExecutionDuration;
 	
 	private boolean remotely;
 	
-	public TaskWrapper(Context context, OfflaodableMethod om, boolean isRemote, ObjectOutputStream oos, ObjectInputStream ois) {
+	public TaskWrapper(Context context, OfflaodableMethod om, String target, ConnectedDeviceList deviceList) {
 		mContext = context;
 		toExecute = om;
-		mObjOutStream = oos;
-		mObjInStream = ois;
-		remotely = isRemote;
+		this.target = target;
+		this.deviceList = deviceList;
+		mObjOutStream = deviceList.getOutputStream(target);
+		mObjInStream = deviceList.getInputStream(target);
+		remotely = (target != null);
 		//targetAddress = address;
 	}
 
@@ -62,6 +66,7 @@ public class TaskWrapper implements Callable<Object> {
 		} catch (Throwable e) {
 			e.printStackTrace();
 		}
+		deviceList.setJobStatusToFree(target);
 		return result;
 	}
 	

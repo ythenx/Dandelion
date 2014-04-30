@@ -24,4 +24,6 @@ public interface Constants {
 	int PROFILER_UPDATE_PERIOD = 1000;
 	
 	int SERVER_PORT = 54321;
+	
+	int DECISION_MAKER_THRESHOLD = 60;
 }
